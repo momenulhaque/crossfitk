@@ -63,7 +63,7 @@ fit_tmle <- DC_tmle_k(data,
 
   5. Understanding the results
 
-The object `fit_tmle` contains a vector of two elements, `rd` and `se`. The first element `rd` shows the average treatment effect, its standard error (`se`). The AIPW can be implemented using  `DC_aipw_k()` function.
+The object `fit_tmle` contains a vector of two elements, `rd` and `se`. The first element `rd` shows the average treatment effect, and its standard error (`se`). The AIPW can be implemented using  `DC_aipw_k()` function.
 
 
 
