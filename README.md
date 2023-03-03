@@ -63,7 +63,7 @@ fit_tmle <- DC_tmle_k(data,
 
 ```
 
-  5. Understanding the results
+5. Understanding the results
 
 The object `fit_tmle` contains a list of two elements, `ATE` and `weight`. The first element `ATE` reports the average treatment effect (`rd`), its standard error (`se`), and confidence limit (`lower.ci` and `upper.ci`). The second element `weight` reports learner specific weights for exposure and outcome model. The weights are averaged (median) over the repetitions.
 
