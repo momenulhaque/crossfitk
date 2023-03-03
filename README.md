@@ -39,6 +39,7 @@ rand_split = FALSE # splits' crossing pattern is not random
 gbound = 0.025
 alpha = 1e-17
 seed = 156
+conf.level = 0.95 # confidence level for confidence interval (default 0.95)
 ```
 
  4. Estimating the average treatment effect (ATE)
@@ -57,13 +58,16 @@ fit_tmle <- DC_tmle_k(data,
                         rand_split,
                         gbound,
                         alpha,
-                        seed)
+                        seed,
+                        conf.level)
 
 ```
 
   5. Understanding the results
 
-The object `fit_tmle` contains a vector of two elements, `rd` and `se`. The first element `rd` shows the average treatment effect, and its standard error (`se`). The AIPW can be implemented using  `DC_aipw_k()` function.
+The object `fit_tmle` contains a list of two elements, `ATE` and `weight`. The first element `ATE` reports the average treatment effect (`rd`), its standard error (`se`), and confidence limit (`lower.ci` and `upper.ci`). The second element `weight` reports learner specific weights for exposure and outcome model. The weights are averaged (median) over the repetitions.
+
+The AIPW can be implemented using  `DC_aipw_k()` function which provides exactly similar outputs.
 
 
 
