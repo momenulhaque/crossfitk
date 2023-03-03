@@ -14,6 +14,7 @@
 #' @param gbound value between (0,1) for truncation of predicted probabilities. The defaults are 0.025 and 0.975. See \code{tmle::tmle()} for more information.
 #' @param alpha used to keep predicted initial values bounded away from (0,1) for logistic fluctuation. The defaults are 1e-17 and 1-1e-17.
 #' @param seed numeric value to reproduce the splits distribution
+#' @param conf.level confidence limit for confidence interval, `default = 0.95`.
 #' @return a tibble of the estimates
 #'
 #' @import dplyr tibble tidyr purrr furrr
@@ -42,7 +43,7 @@ DC_tmle_k <- function(data,
                        gbound = 0.025,
                        alpha = 1e-17,
                        seed=146,
-                       folder){
+                       conf.level=0.95){
 
   runs <- list()
   #Run on num_cf splits
@@ -75,19 +76,35 @@ DC_tmle_k <- function(data,
 
   }
 
-  runs1 <- bind_rows(runs)
 
-  #Medians of splits
-  medians <- apply(runs1, 2, median)
+  res = dplyr::bind_rows(lapply(runs, function(x) x$results))
+
+  #runs1 <- bind_rows(runs)
+
+  weight1 = dplyr::bind_rows(lapply(runs, function(x) x$weight))
+  weight = weight1 %>% group_by(model, split) %>%
+    summarise(across(everything(), ~ median(.x, na.rm = TRUE))) %>%
+    group_by(model) %>%
+    summarise(across(everything(), ~ mean(.x, na.rm = TRUE)))  %>% select(!split)
+
+  medians <- apply(res, 2, median)
+
+  res <- res %>% mutate(var0 = var + (rd - medians[1])^2)
 
 
-  #Corrected variance terms
-  runs1 <- runs1 %>% mutate(var0 = var + (rd - medians[1])^2)
+  results <- apply(res, 2, median)
 
-  results <- apply(runs1, 2, median)
+  t.value = qt((1-conf.level)/2, nrow(data), lower.tail = F)
 
-  res = tibble(rd=results[1], se = sqrt(results[3]))
+  l_ci = results[1] - t.value*sqrt(results[3])
+  u_ci = results[1] + t.value*sqrt(results[3])
 
-  return(res)
+  res = tibble(rd=results[1], se = sqrt(results[3]), lower.ci = l_ci, upper.ci = u_ci)
+
+  fit <- list()
+
+  fit$ATE = res
+  fit$weight = weight
+  fit
 
 }

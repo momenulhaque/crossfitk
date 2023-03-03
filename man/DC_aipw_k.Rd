@@ -19,7 +19,7 @@ DC_aipw_k(
   gbound = 0.025,
   alpha = 1e-17,
   seed = 146,
-  folder
+  conf.level = 0.95
 )
 }
 \arguments{
@@ -50,6 +50,8 @@ DC_aipw_k(
 \item{alpha}{used to keep predicted initial values bounded away from (0,1) for logistic fluctuation. The defaults are 1e-17 and 1-1e-17.}
 
 \item{seed}{numeric value to reproduce the splits distribution}
+
+\item{conf.level}{confidence limit for confidence interval, \code{default = 0.95}.}
 }
 \value{
 a tibble of the estimates

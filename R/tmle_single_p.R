@@ -309,7 +309,23 @@ tmle_single_p = function(data,
   v_rd1 = v_f %>% group_by(ss) %>% summarise(v_rd = var(EIC)/n_var1)
   var1 = mean(v_rd1$v_rd)
 
-  return(tibble(rd=rd, var = var1))
+  res <- tibble(rd=rd, var = var1)
+
+
+  df = dat_nested_p
+  x_weight = bind_rows(lapply(df$pi_fit, function(x) x$coef))
+  y_weight = bind_rows(lapply(df$mu_fit, function(x) x$coef))
+  weight = bind_rows(x_weight, y_weight)
+  weight$model = rep(c("x", "y"), each = n_split)
+  weight$split = rep(1:n_split, times = 2)
+
+  x_prev = unlist(bind_rows(lapply(df$data, function(x) colMeans(x[, exposure], na.rm = TRUE))))
+  y_prev = unlist(bind_rows(lapply(df$data, function(x) colMeans(x[, outcome], na.rm = TRUE))))
+  prev = c(x_prev, y_prev)
+  weight$prev = prev
+
+  fit = list(results=res, weight=weight)
+  fit
 
 }
 
