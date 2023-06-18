@@ -247,10 +247,12 @@ tmle_single_p = function(data,
   names(data_p) = c(dat_name, paste0("mu0_1_", 1:n_split), paste0("mu1_1_", 1:n_split))
 
 
+
   r1 = r0 = rd = NULL
-  r1_0 <- if1_0s <- list()
+  r1_0 <- list()
   if1 = if0 = ifd = list()
   v1 = v0 = vd = NULL
+  rdc <- NULL
 
 
   mu_summ <- list(); n <- NULL
@@ -259,24 +261,24 @@ tmle_single_p = function(data,
   ############### step 1.3.4 - 1.3.5 ######################
 
   if(rand_split == FALSE){
-     for(i in 1:n_split){
-        data_p$ss <- data_p$s
-        mu_summ[[i]] <- data_p %>% filter(s %in% i) %>%
-          select(exposure, outcome, paste0("pi", i), paste0("mu1_1_", i), paste0("mu0_1_", i), ss)
-        names(mu_summ[[i]]) <- c("x", "y", "pi", "mu1", "mu0", "s")
-        n[i] <- nrow(mu_summ[[i]])
-      }
+    for(i in 1:n_split){
+      data_p$ss <- data_p$s
+      mu_summ[[i]] <- data_p %>% filter(s %in% i) %>%
+        select(exposure, outcome, paste0("pi", i), paste0("mu1_1_", i), paste0("mu0_1_", i), ss)
+      names(mu_summ[[i]]) <- c("x", "y", "pi", "mu1", "mu0", "s")
+      n[i] <- nrow(mu_summ[[i]])
+    }
   }
 
 
   if(rand_split == TRUE){
 
     for(i in 1:n_split){
-        data_p$ss <- data_p$s
-        mu_summ[[i]] <- data_p %>% filter(s %in% i) %>%
-          select(exposure, outcome, paste0("pi", i), paste0("mu1_1_", i), paste0("mu0_1_", i), ss)
-        names(mu_summ[[i]]) <- c("x", "y", "pi", "mu1", "mu0", "s")
-        n[i] <- nrow(mu_summ[[i]])
+      data_p$ss <- data_p$s
+      mu_summ[[i]] <- data_p %>% filter(s %in% i) %>%
+        select(exposure, outcome, paste0("pi", i), paste0("mu1_1_", i), paste0("mu0_1_", i), ss)
+      names(mu_summ[[i]]) <- c("x", "y", "pi", "mu1", "mu0", "s")
+      n[i] <- nrow(mu_summ[[i]])
     }
   }
 
@@ -284,30 +286,22 @@ tmle_single_p = function(data,
   mu_sum <- bind_rows(mu_summ)
   mu_sum$ss <- rep(1:n_split, times = n)
 
-  # table(ss=mu_sum$ss, s=mu_sum$s)
+
 
 
   ############ step 1.6 ########################
 
-  r1_0 <- mu_sum %>% group_by(ss) %>% summarise(r1 = mean(mu1), r0 = mean(mu0),
-                                                rd = r1 - r0)
-
-  rd = apply(r1_0[2:4], 2, mean)[3]
-
-
-  ############ step 1.7 ########################
-  r1_0_s <- mu_sum %>% group_by(ss) %>% summarise(r1 = mean(mu1), r0 = mean(mu0))
-
-  v_f = mu_sum %>% group_by(ss) %>% summarise(D1 = (x/pi)*(y-mu1) + (mu1 - mean(mu1)),
-                                                 D0 = ((1-x)/(1-pi))*(y-mu0) + (mu0 - mean(mu0)),
-                                                 EIC = D1-D0)
+  for(i in 1:n_split){
+    rdc[i] <- mean(mu_sum[mu_sum$ss == i, ]$mu1) - mean(mu_sum[mu_sum$ss == i, ]$mu0)
+    D1 = with(mu_sum[mu_sum$ss == i, ], (x/pi)*(y-mu1) + (mu1 - mean(mu1)))
+    D0 = with(mu_sum[mu_sum$ss == i, ], ((1-x)/(1-pi))*(y-mu0) + (mu0 - mean(mu0)))
+    EIC = D1-D0
+    vd[i] <- var(EIC)/nrow(data)
+  }
 
 
-
-
-  n_var1 = nrow(data)
-  v_rd1 = v_f %>% group_by(ss) %>% summarise(v_rd = var(EIC)/n_var1)
-  var1 = mean(v_rd1$v_rd)
+  rd = mean(rdc)
+  var1 = mean(vd)
 
   res <- tibble(rd=rd, var = var1)
 
@@ -325,7 +319,10 @@ tmle_single_p = function(data,
   weight$prev = prev
 
   fit = list(results=res, weight=weight)
+
+
   fit
+
 
 }
 

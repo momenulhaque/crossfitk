@@ -3,6 +3,7 @@
 export(DC_aipw_k)
 export(DC_tmle_k)
 export(aipw_single_p)
+export(generate_placeholder_output)
 export(tmle_single_p)
 import(dplyr)
 import(furrr)

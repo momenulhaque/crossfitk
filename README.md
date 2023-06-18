@@ -6,7 +6,7 @@ Author: Momenul Haque Mondol & Mohammad Ehsanul Karim
 ## How to install
 
 ```{r}
-remotes::install_github("momenulhaque/crossfitk", auth_token = "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") # it will install the package
+remotes::install_github("momenulhaque/crossfitk", auth_token = "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") # it will install the package
 library(crossfitk) 
 ```
 Now the package is ready to use. It supports applying both AIPW and TMLE. 
@@ -65,7 +65,7 @@ fit_tmle <- DC_tmle_k(data,
 
 5. Understanding the results
 
-The object `fit_tmle` contains a list of two elements, `ATE` and `weight`. The first element `ATE` reports the average treatment effect (`rd`), its standard error (`se`), and confidence limit (`lower.ci` and `upper.ci`). The second element `weight` reports learner specific weights for exposure and outcome model. The weights are averaged (median) over the repetitions.
+The object `fit_tmle` contains a list of two elements, `ATE` and `weight`. The first element `ATE` reports the average treatment effect (`rd`), its standard error (`se`), and confidence limit (`lower.ci` and `upper.ci`). The second element `weight` reports learner specific weights for exposure and outcome model. The weights are averaged over the repetitions.
 
 The AIPW can be implemented using  `DC_aipw_k()` function which provides exactly similar outputs.
 

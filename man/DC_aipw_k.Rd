@@ -54,7 +54,7 @@ DC_aipw_k(
 \item{conf.level}{confidence limit for confidence interval, \code{default = 0.95}.}
 }
 \value{
-a tibble of the estimates
+It return a list of two elements. The first element \code{ATE} is a tibble of the estimates. The \code{weight} is a tibble of weights of learners for two different models.
 }
 \description{
 Estimate Average Treatment Effect (ATE) using from AIPW estimator using cross-fit algorithm with parallelizing
