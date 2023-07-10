@@ -6,7 +6,7 @@ Author: Momenul Haque Mondol & Mohammad Ehsanul Karim
 ## How to install
 
 ```{r}
-remotes::install_github("momenulhaque/crossfitk", auth_token = "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") # it will install the package
+remotes::install_github("momenulhaque/crossfitk") # it will install the package
 library(crossfitk) 
 ```
 Now the package is ready to use. It supports applying both AIPW and TMLE. 
